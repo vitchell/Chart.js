@@ -147,9 +147,9 @@ var Chart = function(context){
 		}
 	};
 
-	var ChartEvent = function(data, mouseover, mouseout){
-		// [ Data, Mouseover, Mouseout, Active ]
-		return [ data, mouseover, mouseout, false ];
+	var ChartEvent = function(data, mousein, mouseout){
+		// [ Data, Mousein, Mouseout, Active ]
+		return [ data, mousein, mouseout, false ];
 	}
 
 	var Events = {
@@ -350,7 +350,7 @@ var Chart = function(context){
 			animationSteps : 60,
 			animationEasing : "easeOutQuart",
 			onAnimationComplete : null,
-			graphPointMouseover : null,
+			graphPointMousein : null,
 			graphPointMouseout  : null
 		};		
 		var config = (options) ? mergeChartConfig(chart.Line.defaults,options) : chart.Line.defaults;
@@ -898,14 +898,14 @@ var Chart = function(context){
 					for (var k=0; k<data.datasets[i].data.length; k++){
 						ctx.beginPath();
 						ctx.arc(yAxisPosX + (valueHop *k),xAxisPosY - animPc*(calculateOffset(data.datasets[i].data[k],calculatedScale,scaleHop)),config.pointDotRadius,0,Math.PI*2,true);
-						if( Events.queue && ( config.graphPointMouseover || config.graphPointMouseout ) ){
+						if( Events.queue && ( config.graphPointMousein || config.graphPointMouseout ) ){
 							Events.queue.push( new ChartEvent({ 
 								circle: {
 									y: ( xAxisPosY - animPc * ( calculateOffset( data.datasets[i].data[k], calculatedScale, scaleHop ) ) ), 
 									x: ( yAxisPosX + (valueHop * k) ), 
 									r: config.pointDotRadius 
 								}},
-								config.graphPointMouseover,
+								config.graphPointMousein,
 								config.graphPointMouseout
 							));
 						}

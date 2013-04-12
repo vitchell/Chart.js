@@ -47,8 +47,8 @@
 			
 		};
 
-		var lineChartOptions ={
-			graphPointMouseover: function(data, e){
+		var lineChartOptions = {
+			graphPointMousein: function(data, e){
 				$("#tt").remove();
 				var tt = $("<div id='tt'></div>");
 				tt.text( data.circle.y );
