@@ -147,6 +147,11 @@ var Chart = function(context){
 		}
 	};
 
+	var ChartEvent = function(data, mouseover, mouseout){
+		// [ Data, Mouseover, Mouseout, Active ]
+		return [ data, mouseover, mouseout, false ];
+	}
+
 	var Events = {
 		queue: [],
 		handler: function(e){
@@ -160,8 +165,17 @@ var Chart = function(context){
 			var y_hi 	= queueElem[0].circle.y + queueElem[0].circle.r;
 			var y_low = queueElem[0].circle.y - queueElem[0].circle.r;
 
+			
 			if( e.layerX >= x_low && e.layerX <= x_hi && e.layerY >= y_low && e.layerY <= y_hi ){
-				queueElem[1]( queueElem[0], e );
+				if( queueElem[3] == false ){
+					if( queueElem[1] ) queueElem[1]( queueElem[0], e );
+					queueElem[3] = true;
+				}
+			}else{
+				if( queueElem[3] == true ){
+					if( queueElem[2] ) queueElem[2]( queueElem[0], e );
+					queueElem[3] = false;
+				}
 			}
 		}
 	};
@@ -336,7 +350,8 @@ var Chart = function(context){
 			animationSteps : 60,
 			animationEasing : "easeOutQuart",
 			onAnimationComplete : null,
-			tooltipCallback : null
+			graphPointMouseover : null,
+			graphPointMouseout  : null
 		};		
 		var config = (options) ? mergeChartConfig(chart.Line.defaults,options) : chart.Line.defaults;
 		
@@ -883,8 +898,16 @@ var Chart = function(context){
 					for (var k=0; k<data.datasets[i].data.length; k++){
 						ctx.beginPath();
 						ctx.arc(yAxisPosX + (valueHop *k),xAxisPosY - animPc*(calculateOffset(data.datasets[i].data[k],calculatedScale,scaleHop)),config.pointDotRadius,0,Math.PI*2,true);
-						if( Events.queue && config.tooltipCallback ){
-							Events.queue.push( [ {circle:{y:(xAxisPosY - animPc*(calculateOffset(data.datasets[i].data[k],calculatedScale,scaleHop))), x: (yAxisPosX + (valueHop *k)), r: config.pointDotRadius }}, config.tooltipCallback ] );
+						if( Events.queue && ( config.graphPointMouseover || config.graphPointMouseout ) ){
+							Events.queue.push( new ChartEvent({ 
+								circle: {
+									y: ( xAxisPosY - animPc * ( calculateOffset( data.datasets[i].data[k], calculatedScale, scaleHop ) ) ), 
+									x: ( yAxisPosX + (valueHop * k) ), 
+									r: config.pointDotRadius 
+								}},
+								config.graphPointMouseover,
+								config.graphPointMouseout
+							));
 						}
 						ctx.fill();
 						ctx.stroke();

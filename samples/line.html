@@ -48,13 +48,15 @@
 		};
 
 		var lineChartOptions ={
-			tooltipCallback: function(data, e){
+			graphPointMouseover: function(data, e){
 				$("#tt").remove();
 				var tt = $("<div id='tt'></div>");
 				tt.text( data.circle.y );
 				tt.css("position", "absolute").css("top", e.y).css("left", e.x);
 				$("body").append(tt);
-
+			},
+			graphPointMouseout: function(data, e){
+				$("#tt").remove();
 			}
 		}
 
