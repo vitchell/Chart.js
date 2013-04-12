@@ -4,6 +4,7 @@ This is a fork of Chart.js where I took a few hours to implement some proof of c
 
 Instead of using DOM-based events, it registers shapes and when the mouse moves, it checks to see if the mouse position falls in the shape to trigger a callback. 
 
+See [the Chart.js docs on interactivity](http://www.chartjs.org/docs/#generalIssues-chartInteractivity) for info on why this isn't included by default in Chart.js.
 
 Chart.js
 =======
