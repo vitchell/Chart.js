@@ -4,8 +4,19 @@
 		<title>Line Chart</title>
 		<script src="../Chart.js"></script>
 		<meta name = "viewport" content = "initial-scale = 1, user-scalable = no">
+		<script type="text/javascript">
+    	document.write("\<script src='http://code.jquery.com/jquery-latest.min.js' type='text/javascript'>\<\/script>");
+		</script>
 		<style>
 			canvas{
+			}
+			#tt{
+				background: #fff;
+				border: 1px solid #333;
+				-webkit-border-radius: 5px;
+				-moz-border-radius: 5px;
+				border-radius: 5px;
+				padding: 5px;
 			}
 		</style>
 	</head>
@@ -34,9 +45,20 @@
 				}
 			]
 			
+		};
+
+		var lineChartOptions ={
+			tooltipCallback: function(data, e){
+				$("#tt").remove();
+				var tt = $("<div id='tt'></div>");
+				tt.text( data.circle.y );
+				tt.css("position", "absolute").css("top", e.y).css("left", e.x);
+				$("body").append(tt);
+
+			}
 		}
 
-	var myLine = new Chart(document.getElementById("canvas").getContext("2d")).Line(lineChartData);
+		var myLine = new Chart( document.getElementById("canvas").getContext("2d") ).Line(lineChartData, lineChartOptions);
 	
 	</script>
 	</body>

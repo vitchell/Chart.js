@@ -147,6 +147,30 @@ var Chart = function(context){
 		}
 	};
 
+	var Events = {
+		queue: [],
+		handler: function(e){
+			for( var i in Events.queue ){
+				if( Events.queue[i][0].circle ) Events.circleEvent( e, Events.queue[i] );
+			}
+		},
+		circleEvent: function(e, queueElem){
+			var x_hi 	= queueElem[0].circle.x + queueElem[0].circle.r;
+			var x_low = queueElem[0].circle.x - queueElem[0].circle.r;
+			var y_hi 	= queueElem[0].circle.y + queueElem[0].circle.r;
+			var y_low = queueElem[0].circle.y - queueElem[0].circle.r;
+
+			if( e.layerX >= x_low && e.layerX <= x_hi && e.layerY >= y_low && e.layerY <= y_hi ){
+				queueElem[1]( queueElem[0], e );
+			}
+		}
+	};
+
+	context.canvas.addEventListener('mousemove', function(e){
+		Events.handler( e );
+	}, false);
+
+
 	//Variables global to the chart
 	var width = context.canvas.width;
 	var height = context.canvas.height;
@@ -311,7 +335,8 @@ var Chart = function(context){
 			animation : true,
 			animationSteps : 60,
 			animationEasing : "easeOutQuart",
-			onAnimationComplete : null
+			onAnimationComplete : null,
+			tooltipCallback : null
 		};		
 		var config = (options) ? mergeChartConfig(chart.Line.defaults,options) : chart.Line.defaults;
 		
@@ -825,6 +850,7 @@ var Chart = function(context){
 		animationLoop(config,drawScale,drawLines,ctx);		
 		
 		function drawLines(animPc){
+			Events.queue = [];
 			for (var i=0; i<data.datasets.length; i++){
 				ctx.strokeStyle = data.datasets[i].strokeColor;
 				ctx.lineWidth = config.datasetStrokeWidth;
@@ -857,6 +883,9 @@ var Chart = function(context){
 					for (var k=0; k<data.datasets[i].data.length; k++){
 						ctx.beginPath();
 						ctx.arc(yAxisPosX + (valueHop *k),xAxisPosY - animPc*(calculateOffset(data.datasets[i].data[k],calculatedScale,scaleHop)),config.pointDotRadius,0,Math.PI*2,true);
+						if( Events.queue && config.tooltipCallback ){
+							Events.queue.push( [ {circle:{y:(xAxisPosY - animPc*(calculateOffset(data.datasets[i].data[k],calculatedScale,scaleHop))), x: (yAxisPosX + (valueHop *k)), r: config.pointDotRadius }}, config.tooltipCallback ] );
+						}
 						ctx.fill();
 						ctx.stroke();
 					}
